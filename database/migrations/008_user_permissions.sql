@@ -1,25 +1,20 @@
 -- ============================================
 -- JTECH AI
--- MIGRATION 001 — MEMORIES
+-- MIGRATION 008 — USER PERMISSIONS
 -- ============================================
 
-create table if not exists public.memories (
-    id uuid primary key default gen_random_uuid(),
-
+create table if not exists public.user_permissions (
     user_id uuid not null
         references auth.users(id)
         on delete cascade,
 
-    category text not null,
+    permission text not null,
 
-    content text not null,
+    enabled boolean not null default false,
 
-    importance integer not null default 5
-        check (importance >= 1 and importance <= 10),
+    updated_at timestamptz not null default now(),
 
-    created_at timestamptz not null default now(),
-
-    updated_at timestamptz not null default now()
+    primary key (user_id, permission)
 );
 
 
@@ -27,7 +22,7 @@ create table if not exists public.memories (
 -- ROW LEVEL SECURITY
 -- ============================================
 
-alter table public.memories
+alter table public.user_permissions
 enable row level security;
 
 
@@ -35,30 +30,30 @@ enable row level security;
 -- POLICIES
 -- ============================================
 
-create policy "Users can view their own memories"
-on public.memories
+create policy "Users can view their own permissions"
+on public.user_permissions
 for select
 to authenticated
 using (auth.uid() = user_id);
 
 
-create policy "Users can create their own memories"
-on public.memories
+create policy "Users can create their own permissions"
+on public.user_permissions
 for insert
 to authenticated
 with check (auth.uid() = user_id);
 
 
-create policy "Users can update their own memories"
-on public.memories
+create policy "Users can update their own permissions"
+on public.user_permissions
 for update
 to authenticated
 using (auth.uid() = user_id)
 with check (auth.uid() = user_id);
 
 
-create policy "Users can delete their own memories"
-on public.memories
+create policy "Users can delete their own permissions"
+on public.user_permissions
 for delete
 to authenticated
 using (auth.uid() = user_id);
@@ -69,5 +64,5 @@ using (auth.uid() = user_id);
 -- ============================================
 
 grant select, insert, update, delete
-on public.memories
+on public.user_permissions
 to authenticated;

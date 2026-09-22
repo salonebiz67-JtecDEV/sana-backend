@@ -1,21 +1,16 @@
 -- ============================================
 -- JTECH AI
--- MIGRATION 001 — MEMORIES
+-- MIGRATION 002 — CONVERSATIONS
 -- ============================================
 
-create table if not exists public.memories (
+create table if not exists public.conversations (
     id uuid primary key default gen_random_uuid(),
 
     user_id uuid not null
         references auth.users(id)
         on delete cascade,
 
-    category text not null,
-
-    content text not null,
-
-    importance integer not null default 5
-        check (importance >= 1 and importance <= 10),
+    title text,
 
     created_at timestamptz not null default now(),
 
@@ -27,7 +22,7 @@ create table if not exists public.memories (
 -- ROW LEVEL SECURITY
 -- ============================================
 
-alter table public.memories
+alter table public.conversations
 enable row level security;
 
 
@@ -35,30 +30,30 @@ enable row level security;
 -- POLICIES
 -- ============================================
 
-create policy "Users can view their own memories"
-on public.memories
+create policy "Users can view their own conversations"
+on public.conversations
 for select
 to authenticated
 using (auth.uid() = user_id);
 
 
-create policy "Users can create their own memories"
-on public.memories
+create policy "Users can create their own conversations"
+on public.conversations
 for insert
 to authenticated
 with check (auth.uid() = user_id);
 
 
-create policy "Users can update their own memories"
-on public.memories
+create policy "Users can update their own conversations"
+on public.conversations
 for update
 to authenticated
 using (auth.uid() = user_id)
 with check (auth.uid() = user_id);
 
 
-create policy "Users can delete their own memories"
-on public.memories
+create policy "Users can delete their own conversations"
+on public.conversations
 for delete
 to authenticated
 using (auth.uid() = user_id);
@@ -69,5 +64,5 @@ using (auth.uid() = user_id);
 -- ============================================
 
 grant select, insert, update, delete
-on public.memories
+on public.conversations
 to authenticated;

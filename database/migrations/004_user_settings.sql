@@ -1,21 +1,26 @@
 -- ============================================
 -- JTECH AI
--- MIGRATION 001 — MEMORIES
+-- MIGRATION 004 — USER SETTINGS
 -- ============================================
 
-create table if not exists public.memories (
-    id uuid primary key default gen_random_uuid(),
-
-    user_id uuid not null
+create table if not exists public.user_settings (
+    user_id uuid primary key
         references auth.users(id)
         on delete cascade,
 
-    category text not null,
+    assistant_name text not null default 'Sana',
 
-    content text not null,
+    voice_enabled boolean not null default true,
 
-    importance integer not null default 5
-        check (importance >= 1 and importance <= 10),
+    voice_name text,
+
+    response_style text not null default 'natural',
+
+    notifications_enabled boolean not null default true,
+
+    memory_enabled boolean not null default true,
+
+    proactive_assistance_enabled boolean not null default true,
 
     created_at timestamptz not null default now(),
 
@@ -27,7 +32,7 @@ create table if not exists public.memories (
 -- ROW LEVEL SECURITY
 -- ============================================
 
-alter table public.memories
+alter table public.user_settings
 enable row level security;
 
 
@@ -35,30 +40,30 @@ enable row level security;
 -- POLICIES
 -- ============================================
 
-create policy "Users can view their own memories"
-on public.memories
+create policy "Users can view their own settings"
+on public.user_settings
 for select
 to authenticated
 using (auth.uid() = user_id);
 
 
-create policy "Users can create their own memories"
-on public.memories
+create policy "Users can create their own settings"
+on public.user_settings
 for insert
 to authenticated
 with check (auth.uid() = user_id);
 
 
-create policy "Users can update their own memories"
-on public.memories
+create policy "Users can update their own settings"
+on public.user_settings
 for update
 to authenticated
 using (auth.uid() = user_id)
 with check (auth.uid() = user_id);
 
 
-create policy "Users can delete their own memories"
-on public.memories
+create policy "Users can delete their own settings"
+on public.user_settings
 for delete
 to authenticated
 using (auth.uid() = user_id);
@@ -69,5 +74,5 @@ using (auth.uid() = user_id);
 -- ============================================
 
 grant select, insert, update, delete
-on public.memories
+on public.user_settings
 to authenticated;
