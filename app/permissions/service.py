@@ -1,7 +1,10 @@
 """
-Sana AI — Reminders Service
+JTech AI — Permissions Service
 
-Handles persistent reminders for authenticated users.
+Handles JTech-level permission preferences for
+authenticated users.
+
+Android system permissions remain controlled by Android.
 """
 
 from typing import Any
@@ -11,8 +14,8 @@ from supabase import Client, create_client
 from app.core.config import settings
 
 
-class ReminderService:
-    """Handles Sana user reminders."""
+class PermissionService:
+    """Handles JTech user permission preferences."""
 
     def _get_authenticated_client(
         self,
@@ -29,59 +32,12 @@ class ReminderService:
 
         return client
 
-    async def create_reminder(
-        self,
-        user_id: str,
-        access_token: str,
-        title: str,
-        remind_at: str,
-        message: str | None = None,
-        repeat_rule: str | None = None,
-    ) -> dict[str, Any]:
-        """Create a reminder for the authenticated user."""
-
-        if not title.strip():
-            raise ValueError(
-                "Reminder title cannot be empty."
-            )
-
-        if not remind_at.strip():
-            raise ValueError(
-                "Reminder time cannot be empty."
-            )
-
-        client = self._get_authenticated_client(
-            access_token
-        )
-
-        response = (
-            client
-            .table("reminders")
-            .insert(
-                {
-                    "user_id": user_id,
-                    "title": title.strip(),
-                    "message": message,
-                    "remind_at": remind_at,
-                    "repeat_rule": repeat_rule,
-                }
-            )
-            .execute()
-        )
-
-        if not response.data:
-            raise RuntimeError(
-                "Failed to create reminder."
-            )
-
-        return response.data[0]
-
-    async def get_reminders(
+    async def get_permissions(
         self,
         user_id: str,
         access_token: str,
     ) -> list[dict[str, Any]]:
-        """Get reminders belonging to the authenticated user."""
+        """Get permission preferences for the user."""
 
         client = self._get_authenticated_client(
             access_token
@@ -89,23 +45,28 @@ class ReminderService:
 
         response = (
             client
-            .table("reminders")
+            .table("user_permissions")
             .select("*")
             .eq("user_id", user_id)
-            .order("remind_at", desc=False)
+            .order("permission")
             .execute()
         )
 
         return response.data or []
 
-    async def update_reminder(
+    async def set_permission(
         self,
         user_id: str,
         access_token: str,
-        reminder_id: str,
-        updates: dict[str, Any],
+        permission: str,
+        enabled: bool,
     ) -> dict[str, Any]:
-        """Update a reminder belonging to the user."""
+        """Enable or disable a JTech permission preference."""
+
+        if not permission.strip():
+            raise ValueError(
+                "Permission name cannot be empty."
+            )
 
         client = self._get_authenticated_client(
             access_token
@@ -113,45 +74,24 @@ class ReminderService:
 
         response = (
             client
-            .table("reminders")
-            .update(updates)
-            .eq("id", reminder_id)
-            .eq("user_id", user_id)
+            .table("user_permissions")
+            .upsert(
+                {
+                    "user_id": user_id,
+                    "permission": permission.strip(),
+                    "enabled": enabled,
+                },
+                on_conflict="user_id,permission",
+            )
             .execute()
         )
 
         if not response.data:
             raise RuntimeError(
-                "Reminder not found or could not be updated."
+                "Failed to update permission."
             )
 
         return response.data[0]
 
-    async def delete_reminder(
-        self,
-        user_id: str,
-        access_token: str,
-        reminder_id: str,
-    ) -> None:
-        """Delete a reminder belonging to the user."""
 
-        client = self._get_authenticated_client(
-            access_token
-        )
-
-        response = (
-            client
-            .table("reminders")
-            .delete()
-            .eq("id", reminder_id)
-            .eq("user_id", user_id)
-            .execute()
-        )
-
-        if not response.data:
-            raise RuntimeError(
-                "Reminder not found or could not be deleted."
-            )
-
-
-reminder_service = ReminderService()
+permission_service = PermissionService()
