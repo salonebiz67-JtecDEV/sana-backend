@@ -11,6 +11,7 @@ from app.api.actions import router as actions_router
 from app.api.conversations import (
     router as conversations_router,
 )
+from app.api.live import router as live_router
 from app.api.memory import router as memory_router
 from app.api.settings import router as settings_router
 from app.auth.dependencies import get_current_user
@@ -49,6 +50,8 @@ class ChatResponse(BaseModel):
 app.include_router(memory_router)
 
 app.include_router(actions_router)
+
+app.include_router(live_router)
 
 app.include_router(conversations_router)
 
@@ -125,3 +128,4 @@ async def chat(
             status_code=500,
             detail="Sana was unable to process the request.",
         ) from exc
+        
