@@ -13,7 +13,12 @@ from app.api.conversations import (
 )
 from app.api.live import router as live_router
 from app.api.memory import router as memory_router
+from app.api.permissions import (
+    router as permissions_router,
+)
+from app.api.reminders import router as reminders_router
 from app.api.settings import router as settings_router
+from app.api.tasks import router as tasks_router
 from app.auth.dependencies import get_current_user
 from app.core.config import settings
 from app.core.identity import (
@@ -56,6 +61,12 @@ app.include_router(live_router)
 app.include_router(conversations_router)
 
 app.include_router(settings_router)
+
+app.include_router(permissions_router)
+
+app.include_router(reminders_router)
+
+app.include_router(tasks_router)
 
 
 @app.get("/")
@@ -128,4 +139,3 @@ async def chat(
             status_code=500,
             detail="Sana was unable to process the request.",
         ) from exc
-        
