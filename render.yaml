@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: sana-backend
+    runtime: python
+    region: oregon # change to whichever region is closest to your users
+    plan: free # upgrade later if you outgrow the free tier's limits
+    branch: main
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: /health
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false # set manually in the Render dashboard, never committed
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: PYTHON_VERSION
+        value: "3.12.0"
