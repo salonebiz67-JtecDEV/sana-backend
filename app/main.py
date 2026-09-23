@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 
 from app.ai.actions import SanaAction
 from app.ai.service import ai_service
+from app.api.actions import router as actions_router
 from app.api.conversations import (
     router as conversations_router,
 )
@@ -46,6 +47,8 @@ class ChatResponse(BaseModel):
 
 
 app.include_router(memory_router)
+
+app.include_router(actions_router)
 
 app.include_router(conversations_router)
 
@@ -122,4 +125,3 @@ async def chat(
             status_code=500,
             detail="Sana was unable to process the request.",
         ) from exc
-    
