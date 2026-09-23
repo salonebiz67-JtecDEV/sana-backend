@@ -1,19 +1,19 @@
 """
-JTech AI — AI Service
+Sana AI — AI Service
 
 Coordinates conversations, long-term memory,
-and the JTech AI brain.
+and the Sana AI brain.
 """
 
 from typing import Any
 
-from app.ai.brain import jtech_brain
+from app.ai.brain import sana_brain
 from app.conversation.service import conversation_service
 from app.memory.service import memory_service
 
 
 class AIService:
-    """Coordinates the complete JTech AI request flow."""
+    """Coordinates the complete Sana AI request flow."""
 
     async def process_message(
         self,
@@ -24,7 +24,7 @@ class AIService:
     ) -> dict[str, Any]:
         """
         Process a user message using conversation history,
-        long-term memory, and the JTech AI brain.
+        long-term memory, and the Sana AI brain.
         """
 
         user_message = user_message.strip()
@@ -84,17 +84,17 @@ class AIService:
         )
 
         # --------------------------------------------
-        # GENERATE JTECH RESPONSE
+        # GENERATE SANA RESPONSE (may include a tool/action)
         # --------------------------------------------
 
-        response = jtech_brain.generate_response(
+        result = await sana_brain.generate_response(
             user_message=user_message,
             conversation_messages=previous_messages,
             memory_context=memory_context,
         )
 
         # --------------------------------------------
-        # SAVE JTECH RESPONSE
+        # SAVE SANA RESPONSE
         # --------------------------------------------
 
         await conversation_service.save_message(
@@ -102,12 +102,13 @@ class AIService:
             access_token=access_token,
             conversation_id=conversation_id,
             role="assistant",
-            content=response,
+            content=result["text"],
         )
 
         return {
-            "message": response,
+            "message": result["text"],
             "conversation_id": conversation_id,
+            "action": result["action"],
         }
 
 
