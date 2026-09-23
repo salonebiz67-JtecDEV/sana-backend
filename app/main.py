@@ -5,6 +5,7 @@ Sana AI Backend
 from fastapi import Depends, FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
+from app.ai.actions import SanaAction
 from app.ai.service import ai_service
 from app.api.conversations import (
     router as conversations_router,
@@ -41,6 +42,7 @@ class ChatResponse(BaseModel):
     message: str
     user_id: str
     conversation_id: str
+    action: SanaAction | None = None
 
 
 app.include_router(memory_router)
@@ -106,6 +108,7 @@ async def chat(
             message=result["message"],
             user_id=current_user["id"],
             conversation_id=result["conversation_id"],
+            action=result.get("action"),
         )
 
     except ValueError as exc:
@@ -119,4 +122,4 @@ async def chat(
             status_code=500,
             detail="Sana was unable to process the request.",
         ) from exc
-      
+    
