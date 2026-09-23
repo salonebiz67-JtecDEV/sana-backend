@@ -21,18 +21,18 @@ supabase: Client = create_client(
 )
 
 
-async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
+async def verify_access_token(
+    access_token: str,
 ) -> dict:
     """
-    Verify the Supabase access token and return
-    the authenticated user's information.
+    Verify a raw Supabase access token string and return the
+    authenticated user's information.
 
-    The access token is also returned so database
-    operations can execute in the user's auth context.
+    Shared by both the HTTP dependency below and the WebSocket
+    live-voice endpoint, since WebSocket routes cannot use
+    HTTPBearer/Depends-based header extraction the same way
+    HTTP routes can.
     """
-
-    access_token = credentials.credentials
 
     try:
         response = supabase.auth.get_user(access_token)
@@ -59,3 +59,18 @@ async def get_current_user(
             status_code=401,
             detail="Authentication failed.",
         ) from exc
+
+
+async def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+) -> dict:
+    """
+    Verify the Supabase access token and return
+    the authenticated user's information.
+
+    The access token is also returned so database
+    operations can execute in the user's auth context.
+    """
+
+    return await verify_access_token(credentials.credentials)
+    
