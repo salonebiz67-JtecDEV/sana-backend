@@ -1,5 +1,5 @@
 """
-JTech AI — Memory Service
+Sana AI — Memory Service
 
 Handles long-term memory operations using Supabase
 with authenticated user context.
@@ -13,7 +13,7 @@ from app.core.config import settings
 
 
 class MemoryService:
-    """Handles JTech long-term memory."""
+    """Handles Sana long-term memory."""
 
     def _get_authenticated_client(
         self,
@@ -102,7 +102,7 @@ class MemoryService:
         access_token: str,
         max_memories: int = 10,
     ) -> str:
-        """Build relevant memory context for JTech."""
+        """Build relevant memory context for Sana."""
 
         from app.memory.context import build_memory_context
 
