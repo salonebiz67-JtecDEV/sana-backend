@@ -1,5 +1,5 @@
 """
-JTech AI — User Settings Service
+Sana AI — User Settings Service
 
 Handles persistent settings for authenticated users.
 """
@@ -12,7 +12,7 @@ from app.core.config import settings
 
 
 class SettingsService:
-    """Handles JTech user settings."""
+    """Handles Sana user settings."""
 
     def _get_authenticated_client(
         self,
@@ -54,7 +54,7 @@ class SettingsService:
 
         return {
             "user_id": user_id,
-            "assistant_name": "JTech",
+            "assistant_name": "Sana",
             "voice_enabled": True,
             "voice_name": None,
             "response_style": "natural",
