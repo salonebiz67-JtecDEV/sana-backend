@@ -1,7 +1,7 @@
 """
-JTech AI — Permissions Service
+Sana AI — Permissions Service
 
-Handles JTech-level permission preferences for
+Handles Sana-level permission preferences for
 authenticated users.
 
 Android system permissions remain controlled by Android.
@@ -15,7 +15,7 @@ from app.core.config import settings
 
 
 class PermissionService:
-    """Handles JTech user permission preferences."""
+    """Handles Sana user permission preferences."""
 
     def _get_authenticated_client(
         self,
@@ -61,7 +61,7 @@ class PermissionService:
         permission: str,
         enabled: bool,
     ) -> dict[str, Any]:
-        """Enable or disable a JTech permission preference."""
+        """Enable or disable a Sana permission preference."""
 
         if not permission.strip():
             raise ValueError(
